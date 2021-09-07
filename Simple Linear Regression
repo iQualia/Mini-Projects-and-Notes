@@ -1,0 +1,108 @@
+# First step, import all libraries
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# second, declare the path of the file of the data including the file format
+path = '\DATA\ex1data1.txt'
+df = pd.read_csv(path, header = None, names = ['Population', 'Profit'])
+
+# Print the the first 5 lines of the data
+
+df_head = df.head()
+print (df_head)
+
+# Calculate basic statistic using pandas describe
+
+df_description = df.describe()
+print(df_description)
+
+#plot your data on graph to figure the correlation
+
+df_graph = df.plot(kind = 'scatter', x ='Population', y = 'Profit', figsize = (12,8) )
+print(df_graph)
+
+### LINEAR REGRESSION
+
+def costfunction(X,y,theta):
+    inner = np.power(((X*theta.T)-y),2)
+    return np.sum(inner) / (2*len(X))
+
+
+# append a 'ones columes to represent the y-intercept or the C in y = mx+c
+df_ones = df.insert(0,'Ones',1)#function argument - where, whats is the name, what is the value
+
+#set X (trainind data) nd y (target variable)
+print (df.shape) #it will show the number of row and column
+cols = df.shape[1] # pass the number of column based on df.shape
+X = df.iloc[:,0:cols-1] # list represent all rows, and from 1st column [0] to cols - 1 (column[2] (the population
+# and the ones)
+y = df.iloc[:,cols-1:cols] # y = the profit
+
+
+#convert from data farm to matrices
+# what is happening here? why do we need to use np.matrix?
+X = np.matrix(X.values)
+y = np.matrix(y.values)
+theta = np.matrix(np.array([0,0]))
+
+print(X)
+print(theta)
+
+costfunction(X,y,theta)
+
+## gradient descent
+#what the hell is gradient descent
+#how does gradient descent work
+#what is alpha
+#what is iteration
+
+def gd(X,y,theta,alpha,iters):
+    temp = np.matrix(np.zeros(theta.shape))
+    print(temp)
+    param = int(theta.ravel().shape[1])#take the second value of theta shape once the array has been flatten
+    cost = np.zeros(iters)
+
+    for i in range(iters):
+        error = (X*theta.T)-y
+        for j in range(param):
+            term = np.multipl(error, X[:j])
+            temp[0,j] = theta[0,j] - ((alpha/len(X)))*np.sum(term)
+
+        theta = temp
+        cost[i] = costfunction(X,y,theta)
+
+    return theta,cost
+
+#initialize variables for learning rate and iterations
+alpha = 0.01
+iters = 1000
+
+#perform gd to find best fit
+g,cost = gd(X,y,theta,alpha,iters)
+
+g
+
+costfunction(X,y,g)
+
+# PLOTTING ON GRAPH
+
+x = np.linspace(df.Population.min(), df.Population.max(),100)
+f = g[0,0] + (g[0,1]*x)
+
+fig, ax = plt.subplots(figsize=(12,8))
+ax.plot(x,f,'r', label = 'Prediction')
+ax.scatter(df.Population, df.Profit, label = "Training Data")
+ax.legend(loc=2)
+ax.set_xlabel("population")
+ax.set_ylabel('profit')
+ax.set_title('Predicted profit vs population size')
+
+## Plotting the error rate vs iteration or epoch - attain convergence
+
+fig, ax = plt.subplot(figsize=(12,8))
+ax.plot(np.arange(iters),cost,'r')
+ax.set_xlabel('Iterations')
+ax.set_ylabel('Error')
+ax.set_title("error vs iteration")

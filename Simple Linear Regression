@@ -106,3 +106,6 @@ ax.plot(np.arange(iters),cost,'r')
 ax.set_xlabel('Iterations')
 ax.set_ylabel('Error')
 ax.set_title("error vs iteration")
+
+
+#source KDnugget , Andrew Yang Coursera

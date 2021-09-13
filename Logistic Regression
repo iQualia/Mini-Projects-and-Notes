@@ -1,0 +1,45 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+path = 'D:\Personal\PROJECT\Qualia\ML EXCERCISES\DATA\ex2data1.txt'
+df = pd.read_csv(path, header = None, names = ['Exam 1', 'Exam 2', 'Admitted'])
+print(df.shape)
+
+print(df.head())
+
+#plot the difference
+
+positive = df[df['Admitted'].isin([1])]
+negative = df[df['Admitted'].isin([0])]
+
+fig, ax = plt.subplots(figsize = (12,8))
+ax.scatter(positive['Exam 1'], positive['Exam 2'], s=50, c='b', marker='o', label='Admitted')
+ax.scatter(negative['Exam 1'], negative['Exam 2'], s=50, c='r', marker='x', label='Not Admitted')
+ax.legend()
+ax.set_xlabel('Exam 1 score')
+ax.set_ylabel('Exam 2 score')
+
+#sigmoid function for logistic regression
+
+def sigmoid(x):
+    return 1/1(np.exp(-x))
+
+
+#cost function for logistic regression
+
+def cost(theta, X, y):
+    theta = np.matrix(theta)
+    X = np.matrix(X)
+    y = np.matrix(y)
+    first = np.multiply(-y, np.log(sigmoid(X * theta.T)))
+    second = np.multiply((1 - y), np.log(1 - sigmoid(X * theta.T)))
+    return np.sum(first - second) / (len(X))
+
+# add a ones column - this makes the matrix multiplication work out easier
+df.insert(0, 'Ones', 1)
+# set X (training data) and y (target variable)
+print(df.shape[1]) # insert = Row, column, element
+X = df.iloc[:,0:]
+
+# convert to numpy arrays and initalize the parameter array theta
